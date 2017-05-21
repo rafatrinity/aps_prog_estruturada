@@ -1,4 +1,5 @@
 #include "write.c"
+#include "menus.c"
 #include "functions.c"
 #include "unistd.h"
 #include "stdio.h"
@@ -21,6 +22,7 @@ int main(){
 			ADD();
 			break;
 			case 2:
+			DeleteEmployee();
 			break;
 			case 3:
 			exibir();

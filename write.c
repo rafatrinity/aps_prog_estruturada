@@ -24,5 +24,8 @@ void escreva(int a){
 		printf("\tVERIFIQUE O NOME DIGITADO E TENTE NOVAMENTE!\n");
 		linha();
 		break;
+		case 5:
+		printf("a matricula gerada ja foi cadastrada anteriormente, tente novamente\n");
+		break;
 	}
 }
