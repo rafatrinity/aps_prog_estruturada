@@ -4,6 +4,13 @@
 #include "stdlib.h"
 #include "ctype.h"
 #include "locale.h"
+#include "time.h"
+
+/*
+ * veja mais em 
+ * https://github.com/rafatrinity
+ */
+
 char SISTEMA;
 char apresenta(){
 	/*
@@ -68,7 +75,10 @@ void cab(){
 		system("cls");
 	else
 		system("clear");
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
 	printf("============================================================\n");
-	printf("                  UNICARIOCA - AGENDA\n");
+	printf("\tUNICARIOCA - AGENDA - ");
+	printf("%d/%d/%d - %d:%d\n",tm.tm_mday,tm.tm_mon+1,tm.tm_year + 1900,tm.tm_hour,tm.tm_min);
 	printf("============================================================\n\n");
 }

@@ -2,7 +2,10 @@
 #define functions
 void ADD();
 void exibir();
-void DeleteEmployee();
-void pesquisarnome();
-void pesquisarmatricula();
+void PesquisarNiv();
+void PesquisarNome();
+void PesquisarPosicao();
+void PesquisarMatricula();
+int deleteRecordByName(char *fname);
+int deleteRecordByMatricula(char *fname);
 #endif

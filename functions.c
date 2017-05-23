@@ -1,4 +1,5 @@
 #include "sis.h"
+#include "time.h"
 #include "write.h"
 #include "stdio.h"
 #include "ctype.h"
@@ -6,6 +7,11 @@
 #include "stdlib.h"
 #include "functions.h"
 #define NM 25
+
+/*
+ * veja mais em 
+ * https://github.com/rafatrinity
+ */
 
 //=================================estruturas==============================
 
@@ -29,15 +35,18 @@ void ADD(){
 	FILE *fp;
 	char op;
 	int mat=0;
+	float cr;
 
 //===========================gerador de matriculas============================
 	
 	do{
+		time_t t = time(NULL);
+		struct tm tm = *localtime(&t);
 		fp = fopen("cadastro.bin", "rb");
 		if (fp==NULL)
 			escreva(1);
 		while(fread(&al, sizeof(aluno),1,fp)==1){
-			if (mat+2017000<=al.matricula)
+			if (mat+((tm.tm_year+1900)*1000)<=al.matricula)
 				mat++;
 		}
 		fclose(fp);
@@ -51,12 +60,26 @@ void ADD(){
 		getchar();
 		printf("DIGITE O NOME DO ALUNO: ");
 		fgets(al.nome, NM, stdin);
+		for (int i = 0; i < strlen(al.nome); i++)
+			al.nome[i]=tolower(al.nome[i]);
+		al.nome[0]=toupper(al.nome[0]);
+		for (int i = 0; i < strlen(al.nome); i++){
+			if (al.nome[i]==' ')
+				al.nome[i+1]=toupper(al.nome[i+1]);
+		}
 		printf("\nDIGITE A DATA DE NASCIMENTO DO ALUNO: ");
 		fflush(stdin);
 		scanf("%d %d %d",&al.niver.dia,&al.niver.mes,&al.niver.ano);
+		pcr:
 		printf("\nDIGITE CR DO ALUNO: ");
 		fflush(stdin);
-		scanf("%f",&al.cr);
+		scanf("%f",&cr);
+		if((cr>=0)&&(cr<=10))
+			al.cr=cr;
+		else{
+			escreva(7);
+			goto pcr;
+		}
 		al.matricula = (2017000+mat);
 		fwrite(&al,sizeof(aluno),1,fp);
 		getchar();
@@ -66,11 +89,10 @@ void ADD(){
 	} while (op=='s');
 }
 
-//================================exibir==================================
+//================================exibir======================================
 
 void exibir(){
 	FILE *fp;
-	char op;
 	fp = fopen("cadastro.bin", "rb");
 	if (fp==NULL)
 		escreva(1);
@@ -89,9 +111,9 @@ void exibir(){
 
 //===================================pesquisar================================
 
-void pesquisarnome(){
+void PesquisarNome(){
 	FILE *fp;
-	char op, nome[NM];
+	char nome[NM];
 	int tot =0;
 	fp = fopen("cadastro.bin", "rb");
 	if (fp==NULL)
@@ -100,6 +122,13 @@ void pesquisarnome(){
 	getchar();
 	printf("Digite o nome a ser pesquisado: ");
 	fgets(nome, NM, stdin);
+	for (int i = 0; i < strlen(nome); i++)
+		nome[i]=tolower(nome[i]);
+	nome[0]=toupper(nome[0]);
+	for (int i = 0; i < strlen(nome); i++){
+		if (nome[i]==' ')
+			nome[i+1]=toupper(nome[i+1]);
+	}
 	while(fread(&al, sizeof(aluno),1,fp)==1){
 		if (strcmp(nome, al.nome)==0){
 			printf("Nome: %s",al.nome);
@@ -116,9 +145,10 @@ void pesquisarnome(){
 	getchar();
 }
 
-void pesquisarmatricula(){
+//============================================================================
+
+void PesquisarMatricula(){
 	FILE *fp;
-	char op;
 	int tot =0, mat;
 	fp = fopen("cadastro.bin", "rb");
 	if (fp==NULL)
@@ -144,14 +174,68 @@ void pesquisarmatricula(){
 	getchar();
 }
 
-//=================================remover================================
+//============================================================================
 
-int deleteRecordByName(char *fname, char *searchname){
+void PesquisarPosicao(){
+	FILE *fp;
+	int tot=0, val;
+	fp = fopen("cadastro.bin", "rb");
+	if (fp==NULL)
+		escreva(1);
+	cab();
+	printf("Digite a posição a ser pesquisada: ");
+	scanf("%d",&val);
+	fseek (fp ,sizeof(aluno)*val, SEEK_SET);
+	if(fread(&al, sizeof(aluno),1,fp)==1){
+		printf("Nome: %s",al.nome);
+		printf("MATRICULA: %d\n",al.matricula);
+		printf("CR: %.2f\n",al.cr);
+		printf("Data de nasc: %2.d/%2.d/%4.d\n",al.niver.dia,al.niver.mes,al.niver.ano);
+		linha();
+		tot++;
+	}
+	if (tot==0)
+		escreva(4);
+	getchar();
+	fclose(fp);
+	getchar();
+}
+
+//==================pesquisar por aniversariantes do mes======================
+
+void PesquisarNiv(){
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+	FILE *fp;
+	int tot=0;
+	fp = fopen("cadastro.bin", "rb");
+	if (fp==NULL)
+		escreva(1);
+	cab();
+	while(fread(&al, sizeof(aluno),1,fp)==1){
+		if (al.niver.mes==tm.tm_mon+1){
+			printf("Nome: %s",al.nome);
+			printf("Matricula: %d\n",al.matricula);
+			printf("CR: %.2f\n",al.cr);
+			printf("Data de nasc: %2.d/%2.d/%4.d\n",al.niver.dia,al.niver.mes,al.niver.ano);
+			linha();
+			tot++;
+		}
+	}
+	if (tot==0)
+		escreva(6);
+	getchar();
+	fclose(fp);
+	getchar();
+}
+
+//=================================remover====================================
+
+int deleteRecordByName(char *fname){
 	FILE *fp;
 	FILE *fp_tmp;
 	int found=0;
-	aluno myrecord;
-
+	char nome[NM];
 	fp=fopen(fname, "rb");
 	if (!fp) {
 		printf("Unable to open file %s", fname);
@@ -162,53 +246,75 @@ int deleteRecordByName(char *fname, char *searchname){
 		printf("Unable to open file temp file.");
 		return -1;
 	}
-
-	while (fread(&myrecord,sizeof(aluno),1,fp) == 1) {
-		if (strcmp (searchname, myrecord.nome) == 0) {
-			printf("A record with requested name found and deleted.\n\n");
+	cab();
+	getchar();
+	printf("Digite o nome a ser removido: ");
+	fgets(nome, NM, stdin);
+	for (int i = 0; i < strlen(nome); i++)
+		nome[i]=tolower(nome[i]);
+	nome[0]=toupper(nome[0]);
+	for (int i = 0; i < strlen(nome); i++){
+		if (nome[i]==' ')
+			nome[i+1]=toupper(nome[i+1]);
+	}
+	while (fread(&al,sizeof(aluno),1,fp) == 1) {
+		if (strcmp (nome, al.nome) == 0) {
+			printf("%s foi removido(a) com sucesso!\n", nome);
 			found=1;
-		} else {
-			fwrite(&myrecord, sizeof(aluno), 1, fp_tmp);
-		}
+		} 
+		else
+			fwrite(&al, sizeof(aluno), 1, fp_tmp);
 	}
-	if (! found) {
-		printf("No record(s) found with the requested name: %s\n\n", searchname);
-	}
+	if (!found)
+		escreva(4);
 
 	fclose(fp);
 	fclose(fp_tmp);
 
 	remove(fname);
 	rename("tmp.bin", fname);
-
+	getchar();
 	return 0;
 }
-aluno Employee;
 
-void DeleteEmployee(){
+//==============================deletar pela matricula========================
 
-	FILE *fd;
-	char EmployeeID[8];
-
-	printf("\n>>Delete Employee<<\n");
-
-    //Ask user for ID of employee they wish to delete.
-	printf("Employee ID:");
-	fgets(EmployeeID, 6, stdin);
-
-	if ((fd = fopen("cadastro.bin", "rb")) == NULL) {
-		printf("Error, Cannot Open File.\n");
-	} else {
-		fseek(fd, 0, SEEK_SET);
-		fread(&Employee, sizeof(aluno), 1, fd);
-
-		if (strcmp(EmployeeID, Employee.nome) == 0) {
-
-            //Employee Found
-
-		} else {
-			printf("Employe Not Found!\n");
-		}
+int deleteRecordByMatricula(char *fname){
+	FILE *fp;
+	FILE *fp_tmp;
+	int found=0, mat;
+	fp=fopen(fname, "rb");
+	if (!fp) {
+		printf("Unable to open file %s", fname);
+		return -1;
 	}
-	fclose(fd);
+	fp_tmp=fopen("tmp.bin", "wb");
+	if (!fp_tmp) {
+		printf("Unable to open file temp file.");
+		return -1;
+	}
+	cab();
+	getchar();
+	printf("Digite a matricula a ser removida: ");
+	scanf("%d",&mat);
+	while (fread(&al,sizeof(aluno),1,fp) == 1) {
+		if (mat==al.matricula) {
+			linha();
+			printf("\n\t%s foi removido(a) com sucesso!\n", al.nome);
+			found=1;
+		} 
+		else
+			fwrite(&al, sizeof(aluno), 1, fp_tmp);
+	}
+	if (!found)
+		escreva(4);
+	
+	fclose(fp);
+	fclose(fp_tmp);
+
+	remove(fname);
+	rename("tmp.bin", fname);
+	getchar();
+	getchar();
+	return 0;
 }

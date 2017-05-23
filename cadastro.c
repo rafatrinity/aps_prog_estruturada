@@ -6,6 +6,7 @@
 #include "stdlib.h"
 #include "ctype.h"
 #include "locale.h"
+#include "time.h"
 
 /*
  * veja mais em 
@@ -22,7 +23,7 @@ int main(){
 			ADD();
 			break;
 			case 2:
-			DeleteEmployee();
+			excluir();
 			break;
 			case 3:
 			exibir();

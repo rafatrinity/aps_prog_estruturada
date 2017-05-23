@@ -4,6 +4,15 @@
 #include "stdlib.h"
 #include "locale.h"
 #include "unistd.h"
+#include "ctype.h"
+#include "string.h"
+#define NM 25
+
+/*
+ * veja mais em 
+ * https://github.com/rafatrinity
+ */
+
 void escreva(int a){
 	setlocale(LC_ALL,"portuguesse");
 	cab();
@@ -26,6 +35,12 @@ void escreva(int a){
 		break;
 		case 5:
 		printf("a matricula gerada ja foi cadastrada anteriormente, tente novamente\n");
+		break;
+		case 6:
+		printf("\tnão temos aniversariantes esse mês :(\n");
+		break;
+		case 7:
+		printf("CR INVALIDO\n");
 		break;
 	}
 }
