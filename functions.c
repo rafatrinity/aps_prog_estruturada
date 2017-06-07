@@ -150,6 +150,8 @@ void PesquisarNome(){
 void PesquisarMatricula(){
 	FILE *fp;
 	int tot =0, mat;
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
 	fp = fopen("cadastro.bin", "rb");
 	if (fp==NULL)
 		escreva(1);
@@ -157,7 +159,11 @@ void PesquisarMatricula(){
 	getchar();
 	printf("Digite a matricula do aluno: ");
 	scanf("%d",&mat);
-	while(fread(&al, sizeof(aluno),1,fp)==1){
+	int val = mat-((tm.tm_year+1900)*1000);
+	while(val<0)
+		val+=1000;
+	fseek (fp ,sizeof(aluno)*val, SEEK_SET);
+	if(fread(&al, sizeof(aluno),1,fp)==1){
 		if (mat==al.matricula){
 			printf("Nome: %s",al.nome);
 			printf("Matricula: %d\n",al.matricula);
