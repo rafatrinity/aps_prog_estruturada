@@ -26,8 +26,7 @@ void escreva(int a){
 		sleep(2);
 		break;
 		case 3:
-		printf("\tVOLTE SEMPRE :)\n");
-		sleep(2);
+		fim();
 		break;
 		case 4:
 		printf("\tVERIFIQUE O NOME DIGITADO E TENTE NOVAMENTE!\n");
