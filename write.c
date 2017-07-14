@@ -1,4 +1,4 @@
-#include "sis.c"
+#include "sis.h"
 #include "write.h"
 #include "stdio.h"
 #include "stdlib.h"
