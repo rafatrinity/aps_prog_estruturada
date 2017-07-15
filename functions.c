@@ -1,6 +1,7 @@
 #include "sis.h"
 #include "time.h"
 #include "write.h"
+#include "busca.h"
 #include "stdio.h"
 #include "ctype.h"
 #include "string.h"
@@ -114,6 +115,8 @@ void exibir(){
 void PesquisarNome(){
 	FILE *fp;
 	char nome[NM];
+	char*pn=nome;
+	char*pa=al.nome;
 	int tot =0;
 	fp = fopen("cadastro.bin", "rb");
 	if (fp==NULL)
@@ -130,7 +133,7 @@ void PesquisarNome(){
 			nome[i+1]=toupper(nome[i+1]);
 	}
 	while(fread(&al, sizeof(aluno),1,fp)==1){
-		if (strcmp(nome, al.nome)==0){
+		if (kmp(strlen(al.nome), strlen(nome), pa, pn)==1){
 			printf("Nome: %s",al.nome);
 			printf("Matricula: %d\n",al.matricula);
 			printf("CR: %.2f\n",al.cr);

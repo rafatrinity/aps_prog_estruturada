@@ -15,7 +15,7 @@
 
 int main(){
 	int men;
-	SISTEMA = apresenta();
+	apresenta();
 	do{
 		men = menu();
 		switch(men){
