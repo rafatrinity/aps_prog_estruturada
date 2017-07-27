@@ -1,7 +1,6 @@
 # aps_prog_estruturada
 
 ![UniCarioca Logo](img/uni2.jpg)
-Format: ![UniCarioca Logo](url)
 
 
 cadastro de alunos com arquivo persistente
