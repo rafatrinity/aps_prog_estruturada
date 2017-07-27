@@ -1,7 +1,7 @@
 # aps_prog_estruturada
 ##
 
-![UniCarioca Logo](/home/rafael/Imagens/photo.png)
+![UniCarioca Logo](img/photo.png)
 Format: ![Alt Text](url)
 
 
